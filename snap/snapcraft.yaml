@@ -1,0 +1,49 @@
+name: sayaka-snap # you probably want to 'snapcraft register <name>'
+base: core24
+adopt-info: sayaka
+summary: terminal focused Misskey streaming client
+description: |
+  Sayaka is a terminal focused Misskey streaming client app.
+
+  - Streaming Misskey Home/Local timeline
+  - Available attached image preview with SIXEL suported terminal
+
+  This is the UNOFFICIAL Snap package.
+
+grade: stable
+confinement: strict
+
+parts:
+  sayaka:
+    plugin: nil
+    source: https://github.com/isaki68k/sayaka.git
+    source-tag: 3.8.4
+    build-packages:
+      - bmake
+      - build-essential
+      - libbsd-dev
+      - libgif-dev
+      - libjpeg8-dev
+      - libpng-dev
+      - libssl-dev
+      - libtiff-dev
+      - libwebp-dev
+      - pkg-config
+    stage-packages:
+      - libgif7
+      - libjpeg8
+      - libpng16-16t64
+      - libtiff6
+      - libwebp7
+      - libwebpdemux2
+    override-build: |
+      craftctl set version=$(git describe --tags --abbrev=0)
+      sh configure
+      bmake -DRELEASE all
+      mkdir $CRAFT_PART_INSTALL/bin
+      cp src/sayaka $CRAFT_PART_INSTALL/bin/
+      cp src/sixelv $CRAFT_PART_INSTALL/bin/
+
+apps:
+  sayaka-snap:
+    command: bin/sayaka
